@@ -1,6 +1,19 @@
 ARG FEDORA_MAJOR_VERSION=38
 ARG BASE_IMAGE_URL=ghcr.io/ublue-os/silverblue-main
 
+FROM ${BASE_IMAGE_URL}:${FEDORA_MAJOR_VERSION} AS builder
+
+COPY build-mod.sh /tmp/build-mod.sh
+
+RUN chmod +x /tmp/build-mod.sh && /tmp/build-mod.sh
+
+RUN rpm -ql /var/cache/akmods/*/*.rpm
+
+FROM scratch AS cache
+
+COPY --from=builder /var/cache/akmods/*/*.rpm /
+
+
 FROM ${BASE_IMAGE_URL}:${FEDORA_MAJOR_VERSION}
 ARG RECIPE
 
@@ -15,6 +28,7 @@ COPY usr /usr
 # copy scripts
 RUN mkdir /tmp/scripts
 COPY scripts /tmp/scripts
+COPY --from=cache /*.rpm /tmp/scripts/
 RUN find /tmp/scripts -type f -exec chmod +x {} \;
 
 COPY ${RECIPE} /usr/share/ublue-os/recipe.yml
