@@ -85,7 +85,9 @@ jobs:
         id: labels
         run: |
           ver=$(skopeo inspect docker://${{ env.BASE_IMAGE_URL }}:${{ env.FEDORA_MAJOR_VERSION }} | jq -r '.Labels["org.opencontainers.image.version"]')
+          kernel=$(skopeo inspect docker://${{ env.BASE_IMAGE_URL }}:${{ env.FEDORA_MAJOR_VERSION }} | jq -r '.Labels["ostree.linux"]')
           echo "VERSION=$ver" >> $GITHUB_OUTPUT
+          echo "KERNEL_VERSION=$kernel" >> $GITHUB_ENV
 
       # Build metadata
       - name: Image Metadata
@@ -113,6 +115,7 @@ jobs:
             FEDORA_MAJOR_VERSION=${{ env.FEDORA_MAJOR_VERSION }}
             BASE_IMAGE_URL=${{ env.BASE_IMAGE_URL }}
             RECIPE=${{ matrix.recipe }}
+            KERNEL_VERSION=${{ env.KERNEL_VERSION }}
           labels: ${{ steps.meta.outputs.labels }}
           oci: true
 
