@@ -1,13 +1,14 @@
 ARG FEDORA_MAJOR_VERSION=38
 ARG BASE_IMAGE_URL=ghcr.io/ublue-os/silverblue-main
 
-FROM ${BASE_IMAGE_URL}:${FEDORA_MAJOR_VERSION} AS builder
+FROM quay.io/fedora/fedora:${FEDORA_MAJOR_VERSION} AS builder
+ARG KERNEL_VERSION
 
 COPY build-mod.sh /tmp/build-mod.sh
 
-RUN chmod +x /tmp/build-mod.sh && /tmp/build-mod.sh
-
-RUN rpm -ql /var/cache/akmods/*/*.rpm
+RUN chmod +x /tmp/build-mod.sh \
+ && /tmp/build-mod.sh \
+ && rpm -ql /var/cache/akmods/*/*.rpm
 
 FROM scratch AS cache
 
