@@ -41,7 +41,7 @@ jobs:
     # Only deploys the branch named "live". Ignores all other branches, to allow
     # having "development" branches without interfering with GHCR image uploads.
     name: Build and push image
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
@@ -56,9 +56,6 @@ jobs:
       # Checkout push-to-registry action GitHub repository
       - name: Checkout Push to Registry action
         uses: actions/checkout@v3
-
-      - name: Add yq for reading recipe.yml
-        uses: mikefarah/yq@v4.33.3
 
       - name: Gather image data from recipe
         run: |
@@ -118,8 +115,6 @@ jobs:
             org.opencontainers.image.title=${{ env.IMAGE_NAME }}
             org.opencontainers.image.version=${{ steps.labels.outputs.VERSION }}
             org.opencontainers.image.description=${{ env.IMAGE_DESCRIPTION }}
-            io.artifacthub.package.readme-url=https://raw.githubusercontent.com/ublue-os/startingpoint/main/README.md
-            io.artifacthub.package.logo-url=https://avatars.githubusercontent.com/u/120078124?s=200&v=4
 
       # Build image using Buildah action
       - name: Build Image
